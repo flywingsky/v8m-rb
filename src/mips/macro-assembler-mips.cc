@@ -785,7 +785,7 @@ int MacroAssembler::FindRootIndex(Object* heap_object) {
   return kInvalidRootIndex;
 }
 
-
+static int countS = 0;
 //------------Pseudo-instructions-------------
 
 void MacroAssembler::li(Register rd, Operand j, LiFlags mode) {
@@ -1675,6 +1675,14 @@ void MacroAssembler::Branch(Label* L, Condition cond, Register rs,
       BranchShort(L, cond, rs, rt, bdslot);
     }
   }
+}
+
+
+void MacroAssembler::Branch(Label* L, Condition cond, Register rs,
+                            Heap::RootListIndex index,
+                            BranchDelaySlot bdslot) {
+  LoadRoot(at, index);
+  Branch(L, cond, rs, Operand(at), bdslot);
 }
 
 
@@ -3403,7 +3411,7 @@ void MacroAssembler::StoreNumberToDoubleElements(Register value_reg,
   // Ensure that the object is a heap number
   CheckMap(value_reg,
            scratch1,
-           isolate()->factory()->heap_number_map(),
+           Heap::kHeapNumberMapRootIndex,
            fail,
            DONT_DO_SMI_CHECK);
 
@@ -5270,7 +5278,8 @@ void MacroAssembler::LoadInstanceDescriptors(Register map,
      FieldMemOperand(map, Map::kInstanceDescriptorsOrBitField3Offset));
   Label not_smi;
   JumpIfNotSmi(descriptors, &not_smi);
-  li(descriptors, Operand(FACTORY->empty_descriptor_array()));
+  //li(descriptors, Operand(FACTORY->empty_descriptor_array()));
+  LoadRoot(descriptors, Heap::kEmptyDescriptorArrayRootIndex);
   bind(&not_smi);
 }
 
