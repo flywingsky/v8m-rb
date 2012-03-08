@@ -257,6 +257,7 @@ class MacroAssembler: public Assembler {
     Branch(L);
   }
 
+  int find_root_idx(Operand j);  // plind hack
   int FindRootIndex(Object* heap_object);
   // Load an object from the root table.
   void LoadRoot(Register destination,

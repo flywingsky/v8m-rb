@@ -1278,6 +1278,14 @@ void FullCodeGenerator::EmitVariableLoad(VariableProxy* proxy) {
       // object (receiver) in a0.
       __ lw(a0, GlobalObjectOperand());
       __ li(a2, Operand(var->name()));
+
+      int index = __ find_root_idx(Operand(var->name()));
+      PrintF("EmitVariableLoad : case Variable::UNALLOCATED, root index: %d\n", index);
+
+      var->name()->StringPrint();
+      PrintF("\n");
+      PrintF("\n");
+
       Handle<Code> ic = isolate()->builtins()->LoadIC_Initialize();
       __ Call(ic, RelocInfo::CODE_TARGET_CONTEXT);
       context()->Plug(v0);
@@ -1335,7 +1343,9 @@ void FullCodeGenerator::EmitVariableLoad(VariableProxy* proxy) {
             // binding in harmony mode.
             Label done;
             __ Branch(&done, ne, at, Operand(zero_reg));
+            PrintF("EmitVariableLoad : case Variable::PARAMETER, LOCAL, CONTEXT\n");
             __ li(a0, Operand(var->name()));
+            PrintF("     EVLoad : li(a0, Operand(var->name())\n");
             __ push(a0);
             __ CallRuntime(Runtime::kThrowReferenceError, 1);
             __ bind(&done);
@@ -1360,7 +1370,10 @@ void FullCodeGenerator::EmitVariableLoad(VariableProxy* proxy) {
       EmitDynamicLookupFastCase(var, NOT_INSIDE_TYPEOF, &slow, &done);
       __ bind(&slow);
       Comment cmnt(masm_, "Lookup variable");
+      PrintF("EmitVariableLoad : case Variable::LOOKUP\n");
       __ li(a1, Operand(var->name()));
+      PrintF("     EVLoad : li(a1, Operand(var->name())");
+
       __ Push(cp, a1);  // Context and name.
       __ CallRuntime(Runtime::kLoadContextSlot, 2);
       __ bind(&done);

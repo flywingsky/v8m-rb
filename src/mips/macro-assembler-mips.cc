@@ -785,6 +785,15 @@ int MacroAssembler::FindRootIndex(Object* heap_object) {
   return kInvalidRootIndex;
 }
 
+
+// plind hack to be called from codegen's
+int MacroAssembler::find_root_idx(Operand j) {
+  int32_t index = FindRootIndex(*(reinterpret_cast<Object**>(j.imm32_)));
+  return index;
+}
+
+
+
 static int countS = 0;
 //------------Pseudo-instructions-------------
 
@@ -809,6 +818,7 @@ void MacroAssembler::li(Register rd, Operand j, LiFlags mode) {
       // Replace lui/ori pair for references that are found in root array with
       // relative load using LoadRoot with no relocation info. This replacement
       // is performed only if serialization is turned on.
+      PrintF("Called %d ... roots index: %d\n", ++countS, index);  // plind -- debug
       LoadRoot(rd, static_cast<Heap::RootListIndex>(index));
     } else {
       if (MustUseReg(j.rmode_)) {
