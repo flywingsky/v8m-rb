@@ -1842,6 +1842,8 @@ bool Isolate::Init(Deserializer* des) {
   // stack guard.
   heap_.SetStackLimits();
 
+  if(des != NULL) Assembler::QuietNaN(heap_.nan_value());
+
   deoptimizer_data_ = new DeoptimizerData;
   runtime_profiler_ = new RuntimeProfiler(this);
   runtime_profiler_->SetUp();
